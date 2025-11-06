@@ -5,16 +5,24 @@ import (
 )
 
 type Game struct {
-	input Input
+	sceneManager *SceneManager
+	input        Input
 }
 
 func (g *Game) Update() error {
+	if g.sceneManager == nil {
+		g.sceneManager = NewSceneManager()
+		g.sceneManager.Goto()
+	}
+
 	g.input.Update()
+	g.sceneManager.Update(&g.input)
+
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	drawBlock(screen)
+	g.sceneManager.Draw(screen)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {

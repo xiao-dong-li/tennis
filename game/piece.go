@@ -1,51 +1,95 @@
 package game
 
-import (
-	"bytes"
-	"image"
-	_ "image/png"
-	"log"
-
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/examples/resources/images/blocks"
-)
-
-var imageBlocks *ebiten.Image
-
-func init() {
-	img, _, err := image.Decode(bytes.NewReader(blocks.Blocks_png))
-	if err != nil {
-		log.Fatal(err)
-	}
-	imageBlocks = ebiten.NewImageFromImage(img)
+type Piece struct {
+	blockType BlockType
+	blocks    [][]bool
 }
 
-type BlockType int32
+// Pieces is the set of all the possible pieces.
+var Pieces map[BlockType]*Piece
 
-const (
-	BlockTypeI BlockType = iota
-	BlockTypeJ
-	BlockTypeL
-	BlockTypeO
-	BlockTypeS
-	BlockTypeT
-	BlockTypeZ
-)
+func init() {
+	const (
+		t = true
+		f = false
+	)
 
-const (
-	blockWidth  = 10
-	blockHeight = 10
-)
-
-func drawBlock(r *ebiten.Image) {
-	for i := 0; i < 7; i++ {
-		x0 := i * blockWidth
-		x1 := x0 + blockWidth
-		img := imageBlocks.SubImage(image.Rect(x0, 0, x1, blockHeight)).(*ebiten.Image)
-
-		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Translate(float64(i*20), 0)
-
-		r.DrawImage(img, op)
+	Pieces = map[BlockType]*Piece{
+		BlockTypeI: {
+			blockType: BlockTypeI,
+			blocks: [][]bool{
+				{f, f, f, f},
+				{t, t, t, t},
+				{f, f, f, f},
+				{f, f, f, f},
+			},
+		},
+		BlockTypeJ: {
+			blockType: BlockTypeJ,
+			blocks: [][]bool{
+				{f, t, f},
+				{f, t, f},
+				{t, t, f},
+			},
+		},
+		BlockTypeL: {
+			blockType: BlockTypeL,
+			blocks: [][]bool{
+				{f, t, f},
+				{f, t, f},
+				{f, t, t},
+			},
+		},
+		BlockTypeO: {
+			blockType: BlockTypeO,
+			blocks: [][]bool{
+				{f, f},
+				{f, f},
+			},
+		},
+		BlockTypeS: {
+			blockType: BlockTypeS,
+			blocks: [][]bool{
+				{f, t, t},
+				{t, t, f},
+				{f, f, f},
+			},
+		},
+		BlockTypeT: {
+			blockType: BlockTypeT,
+			blocks: [][]bool{
+				{f, t, f},
+				{t, t, t},
+				{f, f, f},
+			},
+		},
+		BlockTypeZ: {
+			blockType: BlockTypeZ,
+			blocks: [][]bool{
+				{t, t, f},
+				{f, t, t},
+				{f, f, f},
+			},
+		},
 	}
+}
+
+func rotate(matrix [][]bool, clockwise bool) {
+	n := len(matrix)
+	tmp := make([][]bool, n)
+	for i := range tmp {
+		tmp[i] = make([]bool, n)
+	}
+
+	for i, row := range matrix {
+		for j, v := range row {
+			if clockwise {
+				tmp[j][n-1-i] = v
+			} else {
+				tmp[n-1-j][i] = v
+			}
+		}
+	}
+
+	copy(matrix, tmp)
 }
