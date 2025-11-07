@@ -10,15 +10,14 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/images/blocks"
 )
 
-var imageBlocks *ebiten.Image
+const (
+	blockWidth       = 10
+	blockHeight      = 10
+	fieldBlockCountX = 10
+	fieldBlockCountY = 20
+)
 
-func init() {
-	img, _, err := image.Decode(bytes.NewReader(blocks.Blocks_png))
-	if err != nil {
-		log.Fatal(err)
-	}
-	imageBlocks = ebiten.NewImageFromImage(img)
-}
+var imageBlocks *ebiten.Image
 
 type BlockType int32
 
@@ -33,10 +32,13 @@ const (
 	BlockTypeMax
 )
 
-const (
-	blockWidth  = 10
-	blockHeight = 10
-)
+func init() {
+	img, _, err := image.Decode(bytes.NewReader(blocks.Blocks_png))
+	if err != nil {
+		log.Fatal(err)
+	}
+	imageBlocks = ebiten.NewImageFromImage(img)
+}
 
 // drawBlock draws a single block of the given type onto the target image.
 // x, y specify the drawing position in pixels (top-left corner).

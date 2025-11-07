@@ -1,12 +1,12 @@
 package game
 
+// Pieces is the set of all the possible pieces.
+var Pieces map[BlockType]*Piece
+
 type Piece struct {
 	blockType BlockType
 	blocks    [][]bool
 }
-
-// Pieces is the set of all the possible pieces.
-var Pieces map[BlockType]*Piece
 
 func init() {
 	const (

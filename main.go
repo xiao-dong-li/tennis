@@ -8,8 +8,8 @@ import (
 )
 
 func main() {
-	ebiten.SetWindowSize(640, 480)
-	ebiten.SetWindowTitle("Hello, World!")
+	ebiten.SetWindowSize(game.ScreenWidth*2, game.ScreenHeight*2)
+	ebiten.SetWindowTitle("Tetris")
 	if err := ebiten.RunGame(&game.Game{}); err != nil {
 		log.Fatal(err)
 	}

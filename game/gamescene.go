@@ -40,6 +40,8 @@ func (g *GameScene) Update(i *Input) {
 }
 
 func (g *GameScene) Draw(r *ebiten.Image) {
+	r.DrawImage(imageWindows, nil)
+
 	currentPiece := g.currentPiece
 	x := g.currentPieceX
 	y := g.currentPieceY
