@@ -17,7 +17,7 @@ type Game struct {
 func (g *Game) Update() error {
 	if g.sceneManager == nil {
 		g.sceneManager = NewSceneManager()
-		g.sceneManager.Goto()
+		g.sceneManager.GoTo()
 	}
 
 	g.input.Update()

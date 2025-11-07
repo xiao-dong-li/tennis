@@ -18,18 +18,14 @@ func NewGameScene() *GameScene {
 }
 
 func (g *GameScene) Update(i *Input) {
-	g.frameCount++
-
-	if g.currentPiece == nil || g.frameCount%300 == 0 {
-		g.currentPiece = g.choosePiece()
-		g.currentPieceX = 0
-		g.currentPieceY = 0
+	if g.currentPiece == nil {
+		g.initCurrentPiece()
 	}
 
 	if i.IsRotateRight() {
-		rotate(g.currentPiece.blocks, true)
+		g.currentPiece.Rotate(t)
 	} else if i.IsRotateLeft() {
-		rotate(g.currentPiece.blocks, false)
+		g.currentPiece.Rotate(f)
 	} else if i.IsLeft() {
 		g.currentPieceX--
 	} else if i.IsRight() {
@@ -43,15 +39,22 @@ func (g *GameScene) Draw(r *ebiten.Image) {
 	drawBackground(r)
 	r.DrawImage(imageWindows, nil)
 
-	currentPiece := g.currentPiece
-	x := g.currentPieceX
-	y := g.currentPieceY
-	for i, row := range currentPiece.blocks {
-		for j, blocked := range row {
-			if blocked {
-				drawBlock(r, currentPiece.blockType, (j+x)*blockWidth, (i+y)*blockHeight)
-			}
-		}
+	fieldX, fieldY := fieldWindowPosition()
+	x := fieldX + g.currentPieceX*blockWidth
+	y := fieldY + g.currentPieceY*blockHeight
+	g.currentPiece.Draw(r, x, y)
+}
+
+// initCurrentPiece initializes a new falling piece.
+// It selects a random piece, centers it horizontally,
+// and slightly shifts up if it's an I-type block.
+func (g *GameScene) initCurrentPiece() {
+	g.currentPiece = g.choosePiece()
+	g.currentPieceX = (fieldBlockCountX - len(g.currentPiece.blocks)) / 2
+	g.currentPieceY = 0
+
+	if g.currentPiece.blockType == BlockTypeI {
+		g.currentPieceY--
 	}
 }
 

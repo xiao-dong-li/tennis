@@ -25,6 +25,7 @@ func (s *SceneManager) Draw(r *ebiten.Image) {
 	s.current.Draw(r)
 }
 
-func (s *SceneManager) Goto() {
+// GoTo switches to the given scene.
+func (s *SceneManager) GoTo() {
 	s.current = NewGameScene()
 }

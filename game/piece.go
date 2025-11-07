@@ -1,5 +1,12 @@
 package game
 
+import "github.com/hajimehoshi/ebiten/v2"
+
+const (
+	t = true
+	f = false
+)
+
 // Pieces is the set of all the possible pieces.
 var Pieces map[BlockType]*Piece
 
@@ -9,11 +16,6 @@ type Piece struct {
 }
 
 func init() {
-	const (
-		t = true
-		f = false
-	)
-
 	Pieces = map[BlockType]*Piece{
 		BlockTypeI: {
 			blockType: BlockTypeI,
@@ -27,24 +29,24 @@ func init() {
 		BlockTypeJ: {
 			blockType: BlockTypeJ,
 			blocks: [][]bool{
-				{f, t, f},
-				{f, t, f},
-				{t, t, f},
+				{t, f, f},
+				{t, t, t},
+				{f, f, f},
 			},
 		},
 		BlockTypeL: {
 			blockType: BlockTypeL,
 			blocks: [][]bool{
-				{f, t, f},
-				{f, t, f},
-				{f, t, t},
+				{f, f, t},
+				{t, t, t},
+				{f, f, f},
 			},
 		},
 		BlockTypeO: {
 			blockType: BlockTypeO,
 			blocks: [][]bool{
-				{f, f},
-				{f, f},
+				{t, t},
+				{t, t},
 			},
 		},
 		BlockTypeS: {
@@ -74,22 +76,35 @@ func init() {
 	}
 }
 
-func rotate(matrix [][]bool, clockwise bool) {
-	n := len(matrix)
-	tmp := make([][]bool, n)
-	for i := range tmp {
-		tmp[i] = make([]bool, n)
+// Draw renders the piece on the given image at the specified position.
+func (p *Piece) Draw(r *ebiten.Image, x, y int) {
+	for i, row := range p.blocks {
+		for j, blocked := range row {
+			if blocked {
+				drawBlock(r, p.blockType, j*blockWidth+x, i*blockHeight+y)
+			}
+		}
+	}
+}
+
+// Rotate rotates a square matrix 90 degrees.
+// Direction depends on 'clockwise': true = clockwise, false = counterclockwise.
+func (p *Piece) Rotate(clockwise bool) {
+	n := len(p.blocks)
+	matrix := make([][]bool, n)
+	for i := range matrix {
+		matrix[i] = make([]bool, n)
 	}
 
-	for i, row := range matrix {
-		for j, v := range row {
+	for i := 0; i < n; i++ {
+		for j := 0; j < n; j++ {
 			if clockwise {
-				tmp[j][n-1-i] = v
+				matrix[j][n-1-i] = p.blocks[i][j]
 			} else {
-				tmp[n-1-j][i] = v
+				matrix[n-1-j][i] = p.blocks[i][j]
 			}
 		}
 	}
 
-	copy(matrix, tmp)
+	p.blocks = matrix
 }

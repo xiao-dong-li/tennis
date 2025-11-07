@@ -63,6 +63,7 @@ func init() {
 	drawTextWindow("LINES", x, y)
 }
 
+// drawBackground draws the background image.
 func drawBackground(r *ebiten.Image) {
 	bgWidth := imageBackground.Bounds().Dx()
 	bgHeight := imageBackground.Bounds().Dy()
