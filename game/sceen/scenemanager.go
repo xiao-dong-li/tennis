@@ -1,9 +1,12 @@
-package game
+package sceen
 
-import "github.com/hajimehoshi/ebiten/v2"
+import (
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/xiao-dong-li/tennis/game/input"
+)
 
 type Scene interface {
-	Update(input *Input)
+	Update(input *input.Input)
 	Draw(screen *ebiten.Image)
 }
 
@@ -17,7 +20,7 @@ func NewSceneManager() *SceneManager {
 	return &SceneManager{}
 }
 
-func (s *SceneManager) Update(i *Input) {
+func (s *SceneManager) Update(i *input.Input) {
 	s.current.Update(i)
 }
 

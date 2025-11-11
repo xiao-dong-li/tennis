@@ -1,17 +1,14 @@
-package game
+package sceen
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-)
-
-const (
-	ScreenWidth  = 256
-	ScreenHeight = 240
+	"github.com/xiao-dong-li/tennis/game"
+	"github.com/xiao-dong-li/tennis/game/input"
 )
 
 type Game struct {
 	sceneManager *SceneManager
-	input        Input
+	input        input.Input
 }
 
 func (g *Game) Update() error {
@@ -31,5 +28,5 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return ScreenWidth, ScreenHeight
+	return game.ScreenWidth, game.ScreenHeight
 }

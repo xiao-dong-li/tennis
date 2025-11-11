@@ -1,4 +1,4 @@
-module github.com/13842727496/tennis
+module github.com/xiao-dong-li/tennis
 
 go 1.24.2
 

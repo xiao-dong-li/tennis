@@ -1,13 +1,9 @@
-package game
+package input
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-)
-
-const (
-	initialDelay = 10 // Delay before auto-repeat starts
-	repeatRate   = 3  // Repeat every few frames
+	"github.com/xiao-dong-li/tennis/game"
 )
 
 type Input struct{}
@@ -18,7 +14,7 @@ func (i *Input) Update() {}
 // It fires on the first press and then at fixed intervals after an initial delay.
 func (i *Input) isKeyRepeated(key ebiten.Key) bool {
 	d := inpututil.KeyPressDuration(key)
-	return d == 1 || (d > initialDelay && (d-initialDelay)%repeatRate == 0)
+	return d == 1 || (d > game.InitialDelay && (d-game.InitialDelay)%game.RepeatRate == 0)
 }
 
 func (i *Input) IsLeft() bool {

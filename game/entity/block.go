@@ -1,4 +1,4 @@
-package game
+package entity
 
 import (
 	"bytes"
@@ -9,13 +9,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/colorm"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/images/blocks"
-)
-
-const (
-	blockWidth       = 10
-	blockHeight      = 10
-	fieldBlockCountX = 10
-	fieldBlockCountY = 20
+	"github.com/xiao-dong-li/tennis/game"
 )
 
 var imageBlocks *ebiten.Image
@@ -43,16 +37,18 @@ func init() {
 }
 
 // drawBlock draws a single block of the given type onto the target image.
-// x, y specify the drawing position in pixels (top-left corner).
-func drawBlock(r *ebiten.Image, block BlockType, x, y int) {
-	x0 := (int(block) - 1) * blockWidth
-	x1 := x0 + blockWidth
-	img := imageBlocks.SubImage(image.Rect(x0, 0, x1, blockHeight)).(*ebiten.Image)
+// (x, y) specifies the top-left pixel position.
+func drawBlock(dst *ebiten.Image, block BlockType, x, y int) {
+	if block == BlockTypeNone {
+		return
+	}
+
+	srcX := (int(block) - 1) * game.BlockWidth
+	srcRect := image.Rect(srcX, 0, srcX+game.BlockWidth, game.BlockHeight)
+	srcImg := imageBlocks.SubImage(srcRect).(*ebiten.Image)
 
 	op := &colorm.DrawImageOptions{}
 	op.GeoM.Translate(float64(x), float64(y))
 
-	clr := colorm.ColorM{}
-
-	colorm.DrawImage(r, img, clr, op)
+	colorm.DrawImage(dst, srcImg, colorm.ColorM{}, op)
 }

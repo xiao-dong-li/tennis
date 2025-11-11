@@ -1,4 +1,4 @@
-package game
+package render
 
 import (
 	"bytes"
@@ -12,18 +12,14 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/images"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
+	"github.com/xiao-dong-li/tennis/game"
 )
 
-const (
-	fieldWidth  = blockWidth * fieldBlockCountX
-	fieldHeight = blockHeight * fieldBlockCountY
-	topMargin   = (fieldHeight-blockHeight*6)/3 - blockHeight*3 // Top padding area above score, level, and lines
-	fontSize    = 8
-)
+const fontSize = 8
 
 var (
 	imageBackground *ebiten.Image
-	imageWindows    = ebiten.NewImage(ScreenWidth, ScreenHeight)
+	imageWindows    = ebiten.NewImage(game.ScreenWidth, game.ScreenHeight)
 	fontSource      *text.GoTextFaceSource
 )
 
@@ -41,14 +37,14 @@ func init() {
 	imageBackground = ebiten.NewImageFromImage(img)
 
 	// Windows: Field
-	x, y := fieldWindowPosition()
-	drawWindow(x, y, fieldWidth, fieldHeight)
+	x, y := FieldWindowPosition()
+	drawWindow(x, y, game.FieldWidth, game.FieldHeight)
 
 	// Windows: Next
 	x, y = nextLabelPosition()
 	drawTextWithShadow("NEXT", x, y)
-	x, y = nextWindowPosition()
-	drawWindow(x, y, blockWidth*5, blockHeight*5)
+	x, y = NextWindowPosition()
+	drawWindow(x, y, game.BlockWidth*5, game.BlockHeight*5)
 
 	// Windows: Score
 	x, y = scoreLabelPosition()
@@ -63,13 +59,23 @@ func init() {
 	drawTextWindow("LINES", x, y)
 }
 
+// DrawSceneBackground draws the overall scene background including
+// the background image and static window frames.
+func DrawSceneBackground(r *ebiten.Image) {
+	// draw background image
+	drawBackground(r)
+
+	// draw window overlays
+	r.DrawImage(imageWindows, nil)
+}
+
 // drawBackground draws the background image.
 func drawBackground(r *ebiten.Image) {
 	bgWidth := imageBackground.Bounds().Dx()
 	bgHeight := imageBackground.Bounds().Dy()
 
-	scaleX := ScreenWidth / float64(bgWidth)
-	scaleY := ScreenHeight / float64(bgHeight)
+	scaleX := game.ScreenWidth / float64(bgWidth)
+	scaleY := game.ScreenHeight / float64(bgHeight)
 
 	op := &colorm.DrawImageOptions{}
 	op.GeoM.Scale(scaleX, scaleY)
@@ -81,33 +87,33 @@ func drawBackground(r *ebiten.Image) {
 	colorm.DrawImage(r, imageBackground, clr, op)
 }
 
-func fieldWindowPosition() (x, y int) {
+func FieldWindowPosition() (x, y int) {
 	return 20, 20
 }
 
 func nextLabelPosition() (x, y int) {
-	x, y = fieldWindowPosition()
-	return 2*x + fieldWidth, y
+	x, y = FieldWindowPosition()
+	return 2*x + game.FieldWidth, y
 }
 
-func nextWindowPosition() (x, y int) {
+func NextWindowPosition() (x, y int) {
 	x, y = nextLabelPosition()
-	return x, y + blockHeight
+	return x, y + game.BlockHeight
 }
 
 func scoreLabelPosition() (x, y int) {
-	x, y = nextWindowPosition()
-	return x, y + blockWidth*5 + topMargin
+	x, y = NextWindowPosition()
+	return x, y + game.BlockWidth*5 + game.TopMargin
 }
 
 func levelLabelPosition() (x, y int) {
 	x, y = scoreLabelPosition()
-	return x, y + blockHeight*3 + topMargin
+	return x, y + game.BlockHeight*3 + game.TopMargin
 }
 
 func linesLabelPosition() (x, y int) {
 	x, y = levelLabelPosition()
-	return x, y + blockHeight*3 + topMargin
+	return x, y + game.BlockHeight*3 + game.TopMargin
 }
 
 // drawWindow draws a semi-transparent rectangular window at the given position.
@@ -137,7 +143,6 @@ func drawTextWithShadow(str string, x, y int) {
 
 func drawTextWindow(str string, x, y int) {
 	drawTextWithShadow(str, x, y)
-	y += blockHeight
-	fieldX, _ := fieldWindowPosition()
-	drawWindow(x, y, ScreenWidth-x-fieldX, blockHeight*2)
+	fieldX, _ := FieldWindowPosition()
+	drawWindow(x, y+game.BlockHeight, game.ScreenWidth-x-fieldX, game.BlockHeight*2)
 }
