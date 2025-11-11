@@ -24,3 +24,9 @@ const (
 	InitialDelay = 10 // Delay before auto-repeat starts
 	RepeatRate   = 3  // Repeat every few frames
 )
+
+const (
+	DropIntervalBase = 60
+	MinFallInterval  = 5
+	LinesPerLevel    = 10
+)

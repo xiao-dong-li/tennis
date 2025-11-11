@@ -1,6 +1,8 @@
 package entity
 
 import (
+	"slices"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/xiao-dong-li/tennis/game"
 )
@@ -22,6 +24,23 @@ func (f *Field) AddPiece(p *Piece, px, py int) {
 			}
 		}
 	}
+}
+
+// LineClear removes all full lines from the field.
+func (f *Field) LineClear() int {
+	var fullLines int
+	for y, row := range f.Blocks {
+		if !slices.Contains(row[:], BlockTypeNone) {
+			fullLines++
+			// Shift all rows above down by one
+			copy(f.Blocks[1:y+1], f.Blocks[0:y])
+			// Clear the top row
+			for x := 0; x < game.FieldBlockCountX; x++ {
+				f.Blocks[0][x] = BlockTypeNone
+			}
+		}
+	}
+	return fullLines
 }
 
 // Draw renders all placed blocks in the field grid.

@@ -41,21 +41,21 @@ func init() {
 	drawWindow(x, y, game.FieldWidth, game.FieldHeight)
 
 	// Windows: Next
-	x, y = nextLabelPosition()
+	x, y = NextLabelPosition()
 	drawTextWithShadow("NEXT", x, y)
 	x, y = NextWindowPosition()
 	drawWindow(x, y, game.BlockWidth*5, game.BlockHeight*5)
 
 	// Windows: Score
-	x, y = scoreLabelPosition()
+	x, y = ScoreLabelPosition()
 	drawTextWindow("SCORE", x, y)
 
 	// Windows: Level
-	x, y = levelLabelPosition()
+	x, y = LevelLabelPosition()
 	drawTextWindow("LEVEL", x, y)
 
 	// Windows: Lines
-	x, y = linesLabelPosition()
+	x, y = LinesLabelPosition()
 	drawTextWindow("LINES", x, y)
 }
 
@@ -91,28 +91,28 @@ func FieldWindowPosition() (x, y int) {
 	return 20, 20
 }
 
-func nextLabelPosition() (x, y int) {
+func NextLabelPosition() (x, y int) {
 	x, y = FieldWindowPosition()
 	return 2*x + game.FieldWidth, y
 }
 
 func NextWindowPosition() (x, y int) {
-	x, y = nextLabelPosition()
+	x, y = NextLabelPosition()
 	return x, y + game.BlockHeight
 }
 
-func scoreLabelPosition() (x, y int) {
+func ScoreLabelPosition() (x, y int) {
 	x, y = NextWindowPosition()
 	return x, y + game.BlockWidth*5 + game.TopMargin
 }
 
-func levelLabelPosition() (x, y int) {
-	x, y = scoreLabelPosition()
+func LevelLabelPosition() (x, y int) {
+	x, y = ScoreLabelPosition()
 	return x, y + game.BlockHeight*3 + game.TopMargin
 }
 
-func linesLabelPosition() (x, y int) {
-	x, y = levelLabelPosition()
+func LinesLabelPosition() (x, y int) {
+	x, y = LevelLabelPosition()
 	return x, y + game.BlockHeight*3 + game.TopMargin
 }
 

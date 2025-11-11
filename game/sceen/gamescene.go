@@ -16,6 +16,8 @@ type GameScene struct {
 	currentPieceX int
 	currentPieceY int
 	nextPiece     *entity.Piece
+	fallCounter   int
+	lines         int
 }
 
 func NewGameScene() *GameScene {
@@ -26,7 +28,7 @@ func NewGameScene() *GameScene {
 
 func (g *GameScene) Update(i *input.Input) {
 	if g.currentPiece == nil {
-		g.spawnPiece(g.choosePiece())
+		g.SpawnPiece(g.ChoosePiece())
 		return
 	}
 
@@ -34,7 +36,7 @@ func (g *GameScene) Update(i *input.Input) {
 		oldBlocks := game.CloneMatrix(g.currentPiece.Blocks)
 		clockwise := i.IsRotateRight()
 		g.currentPiece.Rotate(clockwise)
-		if g.collides(g.currentPieceX, g.currentPieceY) {
+		if g.Collides(g.currentPieceX, g.currentPieceY) {
 			g.currentPiece.Blocks = oldBlocks
 		}
 	}
@@ -45,15 +47,21 @@ func (g *GameScene) Update(i *input.Input) {
 	} else if i.IsRight() {
 		moveX = 1
 	}
-	if moveX != 0 && !g.collides(g.currentPieceX+moveX, g.currentPieceY) {
+	if moveX != 0 && !g.Collides(g.currentPieceX+moveX, g.currentPieceY) {
 		g.currentPieceX += moveX
 	}
-	if i.IsDown() {
-		if !g.collides(g.currentPieceX, g.currentPieceY+1) {
+
+	g.fallCounter++
+	gravityDrop := g.fallCounter >= max(game.DropIntervalBase-g.Level()*3, game.MinFallInterval)
+
+	if i.IsDown() || gravityDrop {
+		g.fallCounter = 0
+		if !g.Collides(g.currentPieceX, g.currentPieceY+1) {
 			g.currentPieceY++
 		} else {
 			g.field.AddPiece(g.currentPiece, g.currentPieceX, g.currentPieceY)
-			g.spawnPiece(g.nextPiece)
+			g.lines += g.field.LineClear()
+			g.SpawnPiece(g.nextPiece)
 		}
 	}
 }
@@ -78,14 +86,18 @@ func (g *GameScene) Draw(r *ebiten.Image) {
 	g.nextPiece.Draw(r, x, y)
 }
 
-func (g *GameScene) choosePiece() *entity.Piece {
+func (g *GameScene) ChoosePiece() *entity.Piece {
 	n := int(entity.BlockTypeMax)
 	block := entity.BlockType(rand.IntN(n) + 1)
 	return entity.Pieces[block].Clone()
 }
 
-// spawnPiece initializes a new falling piece.
-func (g *GameScene) spawnPiece(piece *entity.Piece) {
+func (g *GameScene) Level() int {
+	return g.lines / game.LinesPerLevel
+}
+
+// SpawnPiece initializes a new falling piece.
+func (g *GameScene) SpawnPiece(piece *entity.Piece) {
 	g.currentPiece = piece
 	g.currentPieceX = (game.FieldBlockCountX - len(piece.Blocks)) / 2
 	g.currentPieceY = 0
@@ -94,11 +106,11 @@ func (g *GameScene) spawnPiece(piece *entity.Piece) {
 		g.currentPieceY--
 	}
 
-	g.nextPiece = g.choosePiece()
+	g.nextPiece = g.ChoosePiece()
 }
 
-// collides checks whether the piece collides with walls or placed blocks.
-func (g *GameScene) collides(px, py int) bool {
+// Collides checks whether the piece collides with walls or placed blocks.
+func (g *GameScene) Collides(px, py int) bool {
 	for i, row := range g.currentPiece.Blocks {
 		for j, blocked := range row {
 			if !blocked {
