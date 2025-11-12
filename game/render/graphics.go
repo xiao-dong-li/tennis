@@ -148,7 +148,7 @@ func drawTextWithShadow(r *ebiten.Image, str string, x, y int, clr color.Color, 
 		Size:   fontSize,
 	}
 
-	// shadow layer
+	// Shadow layer
 	shadowOp := &text.DrawOptions{}
 	shadowOp.GeoM.Translate(float64(x)+1, float64(y)+1)
 	shadowOp.ColorScale.ScaleWithColor(color.RGBA{R: 0, G: 0, B: 0, A: 128})
@@ -156,7 +156,7 @@ func drawTextWithShadow(r *ebiten.Image, str string, x, y int, clr color.Color, 
 	shadowOp.SecondaryAlign = secondaryAlign
 	text.Draw(r, str, face, shadowOp)
 
-	// text layer
+	// Text layer
 	op := &text.DrawOptions{}
 	op.GeoM.Translate(float64(x), float64(y))
 	op.ColorScale.ScaleWithColor(clr)

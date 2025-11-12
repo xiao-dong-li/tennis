@@ -65,6 +65,7 @@ func newPiece(blockType BlockType, blocks [][]bool) *Piece {
 	}
 }
 
+// Clone returns a deep copy of the current Piece.
 func (p *Piece) Clone() *Piece {
 	return &Piece{
 		BlockType: p.BlockType,

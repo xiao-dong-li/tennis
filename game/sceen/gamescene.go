@@ -34,41 +34,13 @@ func (g *GameScene) Update(i *input.Input) {
 	}
 
 	// Handle rotation
-	if i.IsRotateRight() || i.IsRotateLeft() {
-		oldBlocks := game.CloneMatrix(g.currentPiece.Blocks)
-		clockwise := i.IsRotateRight()
-		g.currentPiece.Rotate(clockwise)
-		if g.Collides(g.currentPieceX, g.currentPieceY) {
-			g.currentPiece.Blocks = oldBlocks
-		}
-	}
+	g.handleRotation(i)
 
 	// Handle horizontal movement
-	var moveX int
-	if i.IsLeft() {
-		moveX = -1
-	} else if i.IsRight() {
-		moveX = 1
-	}
-	if moveX != 0 && !g.Collides(g.currentPieceX+moveX, g.currentPieceY) {
-		g.currentPieceX += moveX
-	}
+	g.handleMovement(i)
 
-	g.fallCounter++
-	gravityDrop := g.fallCounter >= max(game.BaseDropInterval-g.Level()*3, game.MinDropInterval)
-	// Handle gravity or manual soft drop
-	if i.IsDown() || gravityDrop {
-		g.fallCounter = 0
-		if !g.Collides(g.currentPieceX, g.currentPieceY+1) {
-			g.currentPieceY++
-		} else {
-			g.field.Merge(g.currentPiece, g.currentPieceX, g.currentPieceY)
-			cleared := g.field.LineClear()
-			g.lines += cleared
-			g.UpdateScore(cleared)
-			g.SpawnPiece(g.nextPiece)
-		}
-	}
+	// Handle falling
+	g.handleFalling(i)
 }
 
 func (g *GameScene) Draw(r *ebiten.Image) {
@@ -94,14 +66,71 @@ func (g *GameScene) Draw(r *ebiten.Image) {
 	g.nextPiece.Draw(r, x, y)
 }
 
+// handleRotation processes clockwise and counterclockwise rotation input.
+func (g *GameScene) handleRotation(i *input.Input) {
+	if !i.IsRotateRight() && !i.IsRotateLeft() {
+		return
+	}
+
+	oldBlocks := game.CloneMatrix(g.currentPiece.Blocks)
+	clockwise := i.IsRotateRight()
+	g.currentPiece.Rotate(clockwise)
+
+	if g.Collides(g.currentPieceX, g.currentPieceY) {
+		g.currentPiece.Blocks = oldBlocks
+	}
+}
+
+// handleMovement processes left and right movement input.
+func (g *GameScene) handleMovement(i *input.Input) {
+	var dx int
+	if i.IsLeft() {
+		dx = -1
+	} else if i.IsRight() {
+		dx = 1
+	}
+
+	if dx != 0 && !g.Collides(g.currentPieceX+dx, g.currentPieceY) {
+		g.currentPieceX += dx
+	}
+}
+
+// handleFalling processes gravity, soft drop, and hard drop.
+func (g *GameScene) handleFalling(i *input.Input) {
+	g.fallCounter++
+
+	// Hard drop
+	if i.IsHardDrop() {
+		g.fallCounter = 0
+		for !g.Collides(g.currentPieceX, g.currentPieceY+1) {
+			g.currentPieceY++
+		}
+		g.LockPiece()
+		return
+	}
+
+	// Gravity or soft drop
+	gravityDrop := g.fallCounter >= max(game.BaseDropInterval-g.Level()*3, game.MinDropInterval)
+	if i.IsDown() || gravityDrop {
+		g.fallCounter = 0
+		if !g.Collides(g.currentPieceX, g.currentPieceY+1) {
+			g.currentPieceY++
+		} else {
+			g.LockPiece()
+		}
+	}
+}
+
+// Level calculates the current level based on cleared lines.
+func (g *GameScene) Level() int {
+	return g.lines / game.LinesPerLevel
+}
+
+// ChoosePiece returns a random new piece.
 func (g *GameScene) ChoosePiece() *entity.Piece {
 	n := int(entity.BlockTypeMax)
 	block := entity.BlockType(rand.IntN(n) + 1)
 	return entity.Pieces[block].Clone()
-}
-
-func (g *GameScene) Level() int {
-	return g.lines / game.LinesPerLevel
 }
 
 // SpawnPiece initializes a new falling piece.
@@ -138,7 +167,21 @@ func (g *GameScene) Collides(px, py int) bool {
 	return false
 }
 
-// UpdateScore increases score based on the number of cleared lines.
+// LockPiece merges the current piece into the field, clears lines, updates score,
+// and spawns the next piece.
+func (g *GameScene) LockPiece() {
+	g.field.Merge(g.currentPiece, g.currentPieceX, g.currentPieceY)
+	cleared := g.field.LineClear()
+
+	// Update score first (based on old level)
+	g.UpdateScore(cleared)
+
+	// Then update total cleared lines
+	g.lines += cleared
+	g.SpawnPiece(g.nextPiece)
+}
+
+// UpdateScore updates the score based on the number of cleared lines and current level.
 func (g *GameScene) UpdateScore(lines int) {
 	level := g.Level() + 1
 	switch lines {
