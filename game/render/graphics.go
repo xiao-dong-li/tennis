@@ -5,6 +5,7 @@ import (
 	"image"
 	"image/color"
 	"log"
+	"strconv"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/colorm"
@@ -21,6 +22,7 @@ var (
 	imageBackground *ebiten.Image
 	imageWindows    = ebiten.NewImage(game.ScreenWidth, game.ScreenHeight)
 	fontSource      *text.GoTextFaceSource
+	labelColor      = color.RGBA{R: 64, G: 64, B: 255, A: 255}
 )
 
 func init() {
@@ -38,35 +40,53 @@ func init() {
 
 	// Windows: Field
 	x, y := FieldWindowPosition()
-	drawWindow(x, y, game.FieldWidth, game.FieldHeight)
+	drawWindow(imageWindows, x, y, game.FieldWidth, game.FieldHeight)
 
 	// Windows: Next
 	x, y = NextLabelPosition()
-	drawTextWithShadow("NEXT", x, y)
+	drawTextWithShadow(imageWindows, "NEXT", x, y, labelColor, text.AlignStart, text.AlignStart)
 	x, y = NextWindowPosition()
-	drawWindow(x, y, game.BlockWidth*5, game.BlockHeight*5)
+	drawWindow(imageWindows, x, y, game.BlockWidth*5, game.BlockHeight*5)
 
 	// Windows: Score
 	x, y = ScoreLabelPosition()
-	drawTextWindow("SCORE", x, y)
+	drawTextWindow(imageWindows, "SCORE", x, y)
 
 	// Windows: Level
 	x, y = LevelLabelPosition()
-	drawTextWindow("LEVEL", x, y)
+	drawTextWindow(imageWindows, "LEVEL", x, y)
 
 	// Windows: Lines
 	x, y = LinesLabelPosition()
-	drawTextWindow("LINES", x, y)
+	drawTextWindow(imageWindows, "LINES", x, y)
 }
 
 // DrawSceneBackground draws the overall scene background including
 // the background image and static window frames.
 func DrawSceneBackground(r *ebiten.Image) {
-	// draw background image
+	// Draw background image
 	drawBackground(r)
 
-	// draw window overlays
+	// Draw window overlays
 	r.DrawImage(imageWindows, nil)
+}
+
+// DrawStatsPanel renders the score, level, and line count on the right-side UI panel.
+func DrawStatsPanel(r *ebiten.Image, score, level, lines int) {
+	fieldX, _ := FieldWindowPosition()
+	x := game.ScreenWidth - fieldX - 5
+
+	// Draw score
+	_, y := ScoreLabelPosition()
+	drawTextWithShadow(r, strconv.Itoa(score), x, y+game.BlockHeight*2, color.White, text.AlignEnd, text.AlignCenter)
+
+	// Draw level
+	_, y = LevelLabelPosition()
+	drawTextWithShadow(r, strconv.Itoa(level), x, y+game.BlockHeight*2, color.White, text.AlignEnd, text.AlignCenter)
+
+	// Draw lines
+	_, y = LinesLabelPosition()
+	drawTextWithShadow(r, strconv.Itoa(lines), x, y+game.BlockHeight*2, color.White, text.AlignEnd, text.AlignCenter)
 }
 
 // drawBackground draws the background image.
@@ -103,7 +123,7 @@ func NextWindowPosition() (x, y int) {
 
 func ScoreLabelPosition() (x, y int) {
 	x, y = NextWindowPosition()
-	return x, y + game.BlockWidth*5 + game.TopMargin
+	return x, y + game.BlockHeight*5 + game.TopMargin
 }
 
 func LevelLabelPosition() (x, y int) {
@@ -117,12 +137,12 @@ func LinesLabelPosition() (x, y int) {
 }
 
 // drawWindow draws a semi-transparent rectangular window at the given position.
-func drawWindow(x, y, width, height int) {
-	vector.FillRect(imageWindows, float32(x), float32(y), float32(width), float32(height), color.RGBA{R: 0, G: 0, B: 0, A: 192}, false)
+func drawWindow(r *ebiten.Image, x, y, width, height int) {
+	vector.FillRect(r, float32(x), float32(y), float32(width), float32(height), color.RGBA{R: 0, G: 0, B: 0, A: 192}, false)
 }
 
 // drawTextWithShadow draws a string with a simple drop shadow effect.
-func drawTextWithShadow(str string, x, y int) {
+func drawTextWithShadow(r *ebiten.Image, str string, x, y int, clr color.Color, primaryAlign, secondaryAlign text.Align) {
 	face := &text.GoTextFace{
 		Source: fontSource,
 		Size:   fontSize,
@@ -132,17 +152,21 @@ func drawTextWithShadow(str string, x, y int) {
 	shadowOp := &text.DrawOptions{}
 	shadowOp.GeoM.Translate(float64(x)+1, float64(y)+1)
 	shadowOp.ColorScale.ScaleWithColor(color.RGBA{R: 0, G: 0, B: 0, A: 128})
-	text.Draw(imageWindows, str, face, shadowOp)
+	shadowOp.PrimaryAlign = primaryAlign
+	shadowOp.SecondaryAlign = secondaryAlign
+	text.Draw(r, str, face, shadowOp)
 
 	// text layer
 	op := &text.DrawOptions{}
 	op.GeoM.Translate(float64(x), float64(y))
-	op.ColorScale.ScaleWithColor(color.RGBA{R: 64, G: 64, B: 255, A: 255})
-	text.Draw(imageWindows, str, face, op)
+	op.ColorScale.ScaleWithColor(clr)
+	op.PrimaryAlign = primaryAlign
+	op.SecondaryAlign = secondaryAlign
+	text.Draw(r, str, face, op)
 }
 
-func drawTextWindow(str string, x, y int) {
-	drawTextWithShadow(str, x, y)
+func drawTextWindow(r *ebiten.Image, str string, x, y int) {
+	drawTextWithShadow(r, str, x, y, labelColor, text.AlignStart, text.AlignStart)
 	fieldX, _ := FieldWindowPosition()
-	drawWindow(x, y+game.BlockHeight, game.ScreenWidth-x-fieldX, game.BlockHeight*2)
+	drawWindow(r, x, y+game.BlockHeight, game.ScreenWidth-x-fieldX, game.BlockHeight*2)
 }

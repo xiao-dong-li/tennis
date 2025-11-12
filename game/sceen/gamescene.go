@@ -70,6 +70,9 @@ func (g *GameScene) Draw(r *ebiten.Image) {
 	// Draw static background and window frame
 	render.DrawSceneBackground(r)
 
+	// Draw stats panel
+	render.DrawStatsPanel(r, 300, g.Level(), g.lines)
+
 	// Draw field blocks
 	fieldX, fieldY := render.FieldWindowPosition()
 	g.field.Draw(r, fieldX, fieldY)
