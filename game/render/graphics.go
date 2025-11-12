@@ -21,6 +21,7 @@ const fontSize = 8
 var (
 	imageBackground *ebiten.Image
 	imageWindows    = ebiten.NewImage(game.ScreenWidth, game.ScreenHeight)
+	imageGameOver   = ebiten.NewImage(game.ScreenWidth, game.ScreenHeight)
 	fontSource      *text.GoTextFaceSource
 	labelColor      = color.RGBA{R: 64, G: 64, B: 255, A: 255}
 )
@@ -59,6 +60,10 @@ func init() {
 	// Windows: Lines
 	x, y = LinesLabelPosition()
 	drawTextWindow(imageWindows, "LINES", x, y)
+
+	// Game Over
+	imageGameOver.Fill(color.RGBA{A: 128})
+	drawTextWithShadow(imageGameOver, "GAME OVER\n\nPRESS SPACE", game.ScreenWidth/2, game.ScreenHeight/2, color.White, text.AlignCenter, text.AlignCenter)
 }
 
 // DrawSceneBackground draws the overall scene background including
@@ -87,6 +92,10 @@ func DrawStatsPanel(r *ebiten.Image, score, level, lines int) {
 	// Draw lines
 	_, y = LinesLabelPosition()
 	drawTextWithShadow(r, strconv.Itoa(lines), x, y+game.BlockHeight*2, color.White, text.AlignEnd, text.AlignCenter)
+}
+
+func DrawGameOver(r *ebiten.Image) {
+	r.DrawImage(imageGameOver, nil)
 }
 
 // drawBackground draws the background image.
@@ -138,7 +147,7 @@ func LinesLabelPosition() (x, y int) {
 
 // drawWindow draws a semi-transparent rectangular window at the given position.
 func drawWindow(r *ebiten.Image, x, y, width, height int) {
-	vector.FillRect(r, float32(x), float32(y), float32(width), float32(height), color.RGBA{R: 0, G: 0, B: 0, A: 192}, false)
+	vector.FillRect(r, float32(x), float32(y), float32(width), float32(height), color.RGBA{A: 192}, false)
 }
 
 // drawTextWithShadow draws a string with a simple drop shadow effect.
@@ -151,7 +160,8 @@ func drawTextWithShadow(r *ebiten.Image, str string, x, y int, clr color.Color, 
 	// Shadow layer
 	shadowOp := &text.DrawOptions{}
 	shadowOp.GeoM.Translate(float64(x)+1, float64(y)+1)
-	shadowOp.ColorScale.ScaleWithColor(color.RGBA{R: 0, G: 0, B: 0, A: 128})
+	shadowOp.ColorScale.ScaleWithColor(color.RGBA{A: 128})
+	shadowOp.LineSpacing = fontSize
 	shadowOp.PrimaryAlign = primaryAlign
 	shadowOp.SecondaryAlign = secondaryAlign
 	text.Draw(r, str, face, shadowOp)
@@ -160,6 +170,7 @@ func drawTextWithShadow(r *ebiten.Image, str string, x, y int, clr color.Color, 
 	op := &text.DrawOptions{}
 	op.GeoM.Translate(float64(x), float64(y))
 	op.ColorScale.ScaleWithColor(clr)
+	op.LineSpacing = fontSize
 	op.PrimaryAlign = primaryAlign
 	op.SecondaryAlign = secondaryAlign
 	text.Draw(r, str, face, op)

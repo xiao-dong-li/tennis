@@ -19,6 +19,7 @@ type GameScene struct {
 	fallCounter   int
 	score         int
 	lines         int
+	gameOver      bool
 }
 
 func NewGameScene() *GameScene {
@@ -30,6 +31,10 @@ func NewGameScene() *GameScene {
 func (g *GameScene) Update(i *input.Input) {
 	if g.currentPiece == nil {
 		g.SpawnPiece(g.ChoosePiece())
+		return
+	}
+
+	if g.gameOver {
 		return
 	}
 
@@ -64,6 +69,10 @@ func (g *GameScene) Draw(r *ebiten.Image) {
 	x = nextX + game.BlockWidth*(5-len(g.nextPiece.Blocks))/2
 	y = nextY + game.BlockHeight*(5-len(g.nextPiece.Blocks))/2
 	g.nextPiece.Draw(r, x, y)
+
+	if g.gameOver {
+		render.DrawGameOver(r)
+	}
 }
 
 // handleRotation processes clockwise and counterclockwise rotation input.
@@ -144,6 +153,10 @@ func (g *GameScene) SpawnPiece(piece *entity.Piece) {
 	}
 
 	g.nextPiece = g.ChoosePiece()
+
+	if g.Collides(g.currentPieceX, g.currentPieceY) {
+		g.gameOver = true
+	}
 }
 
 // Collides checks whether the piece collides with walls or placed blocks.
