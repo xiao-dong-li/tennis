@@ -17,6 +17,7 @@ type GameScene struct {
 	currentPieceY int
 	nextPiece     *entity.Piece
 	fallCounter   int
+	score         int
 	lines         int
 }
 
@@ -32,6 +33,7 @@ func (g *GameScene) Update(i *input.Input) {
 		return
 	}
 
+	// Handle rotation
 	if i.IsRotateRight() || i.IsRotateLeft() {
 		oldBlocks := game.CloneMatrix(g.currentPiece.Blocks)
 		clockwise := i.IsRotateRight()
@@ -41,6 +43,7 @@ func (g *GameScene) Update(i *input.Input) {
 		}
 	}
 
+	// Handle horizontal movement
 	var moveX int
 	if i.IsLeft() {
 		moveX = -1
@@ -52,15 +55,17 @@ func (g *GameScene) Update(i *input.Input) {
 	}
 
 	g.fallCounter++
-	gravityDrop := g.fallCounter >= max(game.DropIntervalBase-g.Level()*3, game.MinFallInterval)
-
+	gravityDrop := g.fallCounter >= max(game.BaseDropInterval-g.Level()*3, game.MinDropInterval)
+	// Handle gravity or manual soft drop
 	if i.IsDown() || gravityDrop {
 		g.fallCounter = 0
 		if !g.Collides(g.currentPieceX, g.currentPieceY+1) {
 			g.currentPieceY++
 		} else {
-			g.field.AddPiece(g.currentPiece, g.currentPieceX, g.currentPieceY)
-			g.lines += g.field.LineClear()
+			g.field.Merge(g.currentPiece, g.currentPieceX, g.currentPieceY)
+			cleared := g.field.LineClear()
+			g.lines += cleared
+			g.UpdateScore(cleared)
 			g.SpawnPiece(g.nextPiece)
 		}
 	}
@@ -71,7 +76,7 @@ func (g *GameScene) Draw(r *ebiten.Image) {
 	render.DrawSceneBackground(r)
 
 	// Draw stats panel
-	render.DrawStatsPanel(r, 300, g.Level(), g.lines)
+	render.DrawStatsPanel(r, g.score, g.Level(), g.lines)
 
 	// Draw field blocks
 	fieldX, fieldY := render.FieldWindowPosition()
@@ -131,4 +136,19 @@ func (g *GameScene) Collides(px, py int) bool {
 		}
 	}
 	return false
+}
+
+// UpdateScore increases score based on the number of cleared lines.
+func (g *GameScene) UpdateScore(lines int) {
+	level := g.Level() + 1
+	switch lines {
+	case 1:
+		g.score += 40 * level
+	case 2:
+		g.score += 100 * level
+	case 3:
+		g.score += 300 * level
+	case 4:
+		g.score += 1200 * level
+	}
 }

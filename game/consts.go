@@ -21,12 +21,12 @@ const (
 )
 
 const (
-	InitialDelay = 10 // Delay before auto-repeat starts
-	RepeatRate   = 3  // Repeat every few frames
+	InputInitialDelay = 10 // Delay before auto-repeat starts
+	InputRepeatRate   = 3  // Repeat every few frames
 )
 
 const (
-	DropIntervalBase = 60
-	MinFallInterval  = 5
-	LinesPerLevel    = 10
+	BaseDropInterval = 60 // Base drop interval in frames at level 0
+	MinDropInterval  = 3  // Fastest possible drop interval
+	LinesPerLevel    = 10 // Number of cleared lines to increase one level
 )

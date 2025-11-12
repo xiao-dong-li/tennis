@@ -14,7 +14,7 @@ func (i *Input) Update() {}
 // It fires on the first press and then at fixed intervals after an initial delay.
 func (i *Input) isKeyRepeated(key ebiten.Key) bool {
 	d := inpututil.KeyPressDuration(key)
-	return d == 1 || (d > game.InitialDelay && (d-game.InitialDelay)%game.RepeatRate == 0)
+	return d == 1 || (d > game.InputInitialDelay && (d-game.InputInitialDelay)%game.InputRepeatRate == 0)
 }
 
 func (i *Input) IsLeft() bool {

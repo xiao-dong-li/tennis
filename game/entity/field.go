@@ -11,8 +11,8 @@ type Field struct {
 	Blocks [game.FieldBlockCountY][game.FieldBlockCountX]BlockType
 }
 
-// AddPiece merges the piece into the field grid.
-func (f *Field) AddPiece(p *Piece, px, py int) {
+// Merge the piece into the field grid.
+func (f *Field) Merge(p *Piece, px, py int) {
 	for i, row := range p.Blocks {
 		for j, blocked := range row {
 			if !blocked {
