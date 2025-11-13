@@ -32,4 +32,5 @@ const (
 	BaseDropInterval = 60 // Base drop interval in frames at level 0
 	MinDropInterval  = 3  // Fastest possible drop interval
 	LinesPerLevel    = 10 // Number of cleared lines to increase one level
+	TransitionFrames = 30 // Transition frame for scene fade
 )
