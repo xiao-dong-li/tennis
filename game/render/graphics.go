@@ -20,6 +20,7 @@ var (
 	imageBackground *ebiten.Image
 	imageWindows    = ebiten.NewImage(game.ScreenWidth, game.ScreenHeight)
 	imageGameOver   = ebiten.NewImage(game.ScreenWidth, game.ScreenHeight)
+	imagePaused     = ebiten.NewImage(game.ScreenWidth, game.ScreenHeight)
 	fontSource      *text.GoTextFaceSource
 	labelColor      = color.RGBA{R: 64, G: 64, B: 255, A: 255}
 )
@@ -64,6 +65,19 @@ func init() {
 	DrawTextWithShadow(
 		imageGameOver,
 		"GAME OVER\n\nPRESS SPACE",
+		game.FontSize,
+		game.ScreenWidth/2,
+		game.ScreenHeight/2,
+		color.White,
+		text.AlignCenter,
+		text.AlignCenter,
+	)
+
+	// Paused
+	imagePaused.Fill(color.RGBA{A: 128})
+	DrawTextWithShadow(
+		imagePaused,
+		"PAUSED",
 		game.FontSize,
 		game.ScreenWidth/2,
 		game.ScreenHeight/2,
@@ -130,6 +144,10 @@ func DrawStatsPanel(r *ebiten.Image, score, level, lines int) {
 
 func DrawGameOver(r *ebiten.Image) {
 	r.DrawImage(imageGameOver, nil)
+}
+
+func DrawPaused(r *ebiten.Image) {
+	r.DrawImage(imagePaused, nil)
 }
 
 // drawBackground draws the background image.

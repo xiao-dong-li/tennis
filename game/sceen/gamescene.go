@@ -19,7 +19,8 @@ type GameScene struct {
 	fallCounter   int
 	score         int
 	lines         int
-	gameOver      bool
+	isGameOver    bool
+	isPaused      bool
 }
 
 func NewGameScene() *GameScene {
@@ -34,7 +35,14 @@ func (g *GameScene) Update(gs *GameState) {
 		return
 	}
 
-	if g.gameOver {
+	if g.isGameOver {
+		return
+	}
+
+	if gs.Input.IsPause() {
+		g.isPaused = !g.isPaused
+	}
+	if g.isPaused {
 		return
 	}
 
@@ -74,8 +82,12 @@ func (g *GameScene) Draw(r *ebiten.Image) {
 		g.nextPiece.Draw(r, x, y)
 	}
 
-	if g.gameOver {
+	if g.isGameOver {
 		render.DrawGameOver(r)
+	}
+
+	if g.isPaused && !g.isGameOver {
+		render.DrawPaused(r)
 	}
 }
 
@@ -159,7 +171,7 @@ func (g *GameScene) SpawnPiece(piece *entity.Piece) {
 	g.nextPiece = g.ChoosePiece()
 
 	if g.Collides(g.currentPieceX, g.currentPieceY) {
-		g.gameOver = true
+		g.isGameOver = true
 	}
 }
 
