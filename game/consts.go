@@ -1,6 +1,7 @@
 package game
 
 const (
+	Title        = "Tetris"
 	ScreenWidth  = 256
 	ScreenHeight = 240
 )
@@ -11,6 +12,8 @@ const (
 )
 
 const (
+	FontSize         = 8
+	TitleFontSize    = 32
 	FieldBlockCountX = 10 // Number of blocks horizontally
 	FieldBlockCountY = 20 // Number of blocks vertically
 

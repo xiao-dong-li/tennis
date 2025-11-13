@@ -29,6 +29,10 @@ func (i *Input) IsDown() bool {
 	return i.isKeyRepeated(ebiten.KeyDown)
 }
 
+func (i *Input) IsSpace() bool {
+	return inpututil.IsKeyJustPressed(ebiten.KeySpace)
+}
+
 func (i *Input) IsHardDrop() bool {
 	return inpututil.IsKeyJustPressed(ebiten.KeySpace)
 }

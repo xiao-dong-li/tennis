@@ -28,7 +28,7 @@ func NewGameScene() *GameScene {
 	}
 }
 
-func (g *GameScene) Update(i *input.Input) {
+func (g *GameScene) Update(gs *GameState) {
 	if g.currentPiece == nil {
 		g.SpawnPiece(g.ChoosePiece())
 		return
@@ -39,13 +39,13 @@ func (g *GameScene) Update(i *input.Input) {
 	}
 
 	// Handle rotation
-	g.handleRotation(i)
+	g.handleRotation(gs.Input)
 
 	// Handle horizontal movement
-	g.handleMovement(i)
+	g.handleMovement(gs.Input)
 
 	// Handle falling
-	g.handleFalling(i)
+	g.handleFalling(gs.Input)
 }
 
 func (g *GameScene) Draw(r *ebiten.Image) {
@@ -60,15 +60,19 @@ func (g *GameScene) Draw(r *ebiten.Image) {
 	g.field.Draw(r, fieldX, fieldY)
 
 	// Draw current falling piece
-	x := fieldX + g.currentPieceX*game.BlockWidth
-	y := fieldY + g.currentPieceY*game.BlockHeight
-	g.currentPiece.Draw(r, x, y)
+	if g.currentPiece != nil {
+		x := fieldX + g.currentPieceX*game.BlockWidth
+		y := fieldY + g.currentPieceY*game.BlockHeight
+		g.currentPiece.Draw(r, x, y)
+	}
 
 	// Draw next piece preview
 	nextX, nextY := render.NextWindowPosition()
-	x = nextX + game.BlockWidth*(5-len(g.nextPiece.Blocks))/2
-	y = nextY + game.BlockHeight*(5-len(g.nextPiece.Blocks))/2
-	g.nextPiece.Draw(r, x, y)
+	if g.nextPiece != nil {
+		x := nextX + game.BlockWidth*(5-len(g.nextPiece.Blocks))/2
+		y := nextY + game.BlockHeight*(5-len(g.nextPiece.Blocks))/2
+		g.nextPiece.Draw(r, x, y)
+	}
 
 	if g.gameOver {
 		render.DrawGameOver(r)

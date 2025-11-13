@@ -6,7 +6,7 @@ import (
 )
 
 type Scene interface {
-	Update(input *input.Input)
+	Update(input *GameState)
 	Draw(screen *ebiten.Image)
 }
 
@@ -16,12 +16,24 @@ type SceneManager struct {
 	transitionCount int   // remaining frames for scene transition (fade effect)
 }
 
+type GameState struct {
+	SceneManager *SceneManager
+	Input        *input.Input
+}
+
 func NewSceneManager() *SceneManager {
 	return &SceneManager{}
 }
 
+func NewGameState(sceneManager *SceneManager, i *input.Input) *GameState {
+	return &GameState{
+		SceneManager: sceneManager,
+		Input:        i,
+	}
+}
+
 func (s *SceneManager) Update(i *input.Input) {
-	s.current.Update(i)
+	s.current.Update(NewGameState(s, i))
 }
 
 func (s *SceneManager) Draw(r *ebiten.Image) {
@@ -29,6 +41,6 @@ func (s *SceneManager) Draw(r *ebiten.Image) {
 }
 
 // GoTo switches to the given scene.
-func (s *SceneManager) GoTo() {
-	s.current = NewGameScene()
+func (s *SceneManager) GoTo(scene Scene) {
+	s.current = scene
 }

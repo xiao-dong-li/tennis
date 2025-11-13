@@ -20,41 +20,55 @@ func init() {
 		f = false
 	)
 	Pieces = map[BlockType]*Piece{
-		BlockTypeI: newPiece(BlockTypeI, [][]bool{
-			{f, f, f, f},
-			{t, t, t, t},
-			{f, f, f, f},
-			{f, f, f, f},
-		}),
-		BlockTypeJ: newPiece(BlockTypeJ, [][]bool{
-			{t, f, f},
-			{t, t, t},
-			{f, f, f},
-		}),
-		BlockTypeL: newPiece(BlockTypeL, [][]bool{
-			{f, f, t},
-			{t, t, t},
-			{f, f, f},
-		}),
-		BlockTypeO: newPiece(BlockTypeO, [][]bool{
-			{t, t},
-			{t, t},
-		}),
-		BlockTypeS: newPiece(BlockTypeS, [][]bool{
-			{f, t, t},
-			{t, t, f},
-			{f, f, f},
-		}),
-		BlockTypeT: newPiece(BlockTypeT, [][]bool{
-			{f, t, f},
-			{t, t, t},
-			{f, f, f},
-		}),
-		BlockTypeZ: newPiece(BlockTypeZ, [][]bool{
-			{t, t, f},
-			{f, t, t},
-			{f, f, f},
-		}),
+		BlockTypeI: newPiece(
+			BlockTypeI, [][]bool{
+				{f, f, f, f},
+				{t, t, t, t},
+				{f, f, f, f},
+				{f, f, f, f},
+			},
+		),
+		BlockTypeJ: newPiece(
+			BlockTypeJ, [][]bool{
+				{t, f, f},
+				{t, t, t},
+				{f, f, f},
+			},
+		),
+		BlockTypeL: newPiece(
+			BlockTypeL, [][]bool{
+				{f, f, t},
+				{t, t, t},
+				{f, f, f},
+			},
+		),
+		BlockTypeO: newPiece(
+			BlockTypeO, [][]bool{
+				{t, t},
+				{t, t},
+			},
+		),
+		BlockTypeS: newPiece(
+			BlockTypeS, [][]bool{
+				{f, t, t},
+				{t, t, f},
+				{f, f, f},
+			},
+		),
+		BlockTypeT: newPiece(
+			BlockTypeT, [][]bool{
+				{f, t, f},
+				{t, t, t},
+				{f, f, f},
+			},
+		),
+		BlockTypeZ: newPiece(
+			BlockTypeZ, [][]bool{
+				{t, t, f},
+				{f, t, t},
+				{f, f, f},
+			},
+		),
 	}
 }
 

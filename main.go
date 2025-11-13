@@ -10,7 +10,7 @@ import (
 
 func main() {
 	ebiten.SetWindowSize(game.ScreenWidth*2, game.ScreenHeight*2)
-	ebiten.SetWindowTitle("Tetris")
+	ebiten.SetWindowTitle(game.Title)
 	if err := ebiten.RunGame(&sceen.Game{}); err != nil {
 		log.Fatal(err)
 	}

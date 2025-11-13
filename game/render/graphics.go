@@ -16,8 +16,6 @@ import (
 	"github.com/xiao-dong-li/tennis/game"
 )
 
-const fontSize = 8
-
 var (
 	imageBackground *ebiten.Image
 	imageWindows    = ebiten.NewImage(game.ScreenWidth, game.ScreenHeight)
@@ -45,7 +43,7 @@ func init() {
 
 	// Windows: Next
 	x, y = NextLabelPosition()
-	drawTextWithShadow(imageWindows, "NEXT", x, y, labelColor, text.AlignStart, text.AlignStart)
+	DrawTextWithShadow(imageWindows, "NEXT", game.FontSize, x, y, labelColor, text.AlignStart, text.AlignStart)
 	x, y = NextWindowPosition()
 	drawWindow(imageWindows, x, y, game.BlockWidth*5, game.BlockHeight*5)
 
@@ -63,7 +61,16 @@ func init() {
 
 	// Game Over
 	imageGameOver.Fill(color.RGBA{A: 128})
-	drawTextWithShadow(imageGameOver, "GAME OVER\n\nPRESS SPACE", game.ScreenWidth/2, game.ScreenHeight/2, color.White, text.AlignCenter, text.AlignCenter)
+	DrawTextWithShadow(
+		imageGameOver,
+		"GAME OVER\n\nPRESS SPACE",
+		game.FontSize,
+		game.ScreenWidth/2,
+		game.ScreenHeight/2,
+		color.White,
+		text.AlignCenter,
+		text.AlignCenter,
+	)
 }
 
 // DrawSceneBackground draws the overall scene background including
@@ -83,15 +90,42 @@ func DrawStatsPanel(r *ebiten.Image, score, level, lines int) {
 
 	// Draw score
 	_, y := ScoreLabelPosition()
-	drawTextWithShadow(r, strconv.Itoa(score), x, y+game.BlockHeight*2, color.White, text.AlignEnd, text.AlignCenter)
+	DrawTextWithShadow(
+		r,
+		strconv.Itoa(score),
+		game.FontSize,
+		x,
+		y+game.BlockHeight*2,
+		color.White,
+		text.AlignEnd,
+		text.AlignCenter,
+	)
 
 	// Draw level
 	_, y = LevelLabelPosition()
-	drawTextWithShadow(r, strconv.Itoa(level), x, y+game.BlockHeight*2, color.White, text.AlignEnd, text.AlignCenter)
+	DrawTextWithShadow(
+		r,
+		strconv.Itoa(level),
+		game.FontSize,
+		x,
+		y+game.BlockHeight*2,
+		color.White,
+		text.AlignEnd,
+		text.AlignCenter,
+	)
 
 	// Draw lines
 	_, y = LinesLabelPosition()
-	drawTextWithShadow(r, strconv.Itoa(lines), x, y+game.BlockHeight*2, color.White, text.AlignEnd, text.AlignCenter)
+	DrawTextWithShadow(
+		r,
+		strconv.Itoa(lines),
+		game.FontSize,
+		x,
+		y+game.BlockHeight*2,
+		color.White,
+		text.AlignEnd,
+		text.AlignCenter,
+	)
 }
 
 func DrawGameOver(r *ebiten.Image) {
@@ -150,18 +184,24 @@ func drawWindow(r *ebiten.Image, x, y, width, height int) {
 	vector.FillRect(r, float32(x), float32(y), float32(width), float32(height), color.RGBA{A: 192}, false)
 }
 
-// drawTextWithShadow draws a string with a simple drop shadow effect.
-func drawTextWithShadow(r *ebiten.Image, str string, x, y int, clr color.Color, primaryAlign, secondaryAlign text.Align) {
+// DrawTextWithShadow draws a string with a simple drop shadow effect.
+func DrawTextWithShadow(
+	r *ebiten.Image,
+	str string,
+	s, x, y int,
+	clr color.Color,
+	primaryAlign, secondaryAlign text.Align,
+) {
 	face := &text.GoTextFace{
 		Source: fontSource,
-		Size:   fontSize,
+		Size:   float64(s),
 	}
 
 	// Shadow layer
 	shadowOp := &text.DrawOptions{}
 	shadowOp.GeoM.Translate(float64(x)+1, float64(y)+1)
 	shadowOp.ColorScale.ScaleWithColor(color.RGBA{A: 128})
-	shadowOp.LineSpacing = fontSize
+	shadowOp.LineSpacing = game.FontSize
 	shadowOp.PrimaryAlign = primaryAlign
 	shadowOp.SecondaryAlign = secondaryAlign
 	text.Draw(r, str, face, shadowOp)
@@ -170,14 +210,14 @@ func drawTextWithShadow(r *ebiten.Image, str string, x, y int, clr color.Color, 
 	op := &text.DrawOptions{}
 	op.GeoM.Translate(float64(x), float64(y))
 	op.ColorScale.ScaleWithColor(clr)
-	op.LineSpacing = fontSize
+	op.LineSpacing = game.FontSize
 	op.PrimaryAlign = primaryAlign
 	op.SecondaryAlign = secondaryAlign
 	text.Draw(r, str, face, op)
 }
 
 func drawTextWindow(r *ebiten.Image, str string, x, y int) {
-	drawTextWithShadow(r, str, x, y, labelColor, text.AlignStart, text.AlignStart)
+	DrawTextWithShadow(r, str, game.FontSize, x, y, labelColor, text.AlignStart, text.AlignStart)
 	fieldX, _ := FieldWindowPosition()
 	drawWindow(r, x, y+game.BlockHeight, game.ScreenWidth-x-fieldX, game.BlockHeight*2)
 }
