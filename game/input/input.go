@@ -48,3 +48,7 @@ func (i *Input) IsRotateLeft() bool {
 func (i *Input) IsPause() bool {
 	return inpututil.IsKeyJustPressed(ebiten.KeyP) || inpututil.IsKeyJustPressed(ebiten.KeyEscape)
 }
+
+func (i *Input) IsRestart() bool {
+	return inpututil.IsKeyJustPressed(ebiten.KeyR)
+}

@@ -36,6 +36,9 @@ func (g *GameScene) Update(gs *GameState) {
 	}
 
 	if g.isGameOver {
+		if gs.Input.IsSpace() {
+			gs.SceneManager.GoTo(NewTitleScene())
+		}
 		return
 	}
 
@@ -43,6 +46,11 @@ func (g *GameScene) Update(gs *GameState) {
 		g.isPaused = !g.isPaused
 	}
 	if g.isPaused {
+		return
+	}
+
+	if gs.Input.IsRestart() {
+		gs.SceneManager.GoTo(NewTitleScene())
 		return
 	}
 
