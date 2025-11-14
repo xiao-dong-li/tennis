@@ -22,7 +22,10 @@ jobs:
       #  run: make deps
 
       - name: Install Linux graphical dependencies
-        run: sudo apt-get update && sudo apt-get install -y libx11-dev libxrandr-dev
+        run: sudo apt-get update && sudo apt-get install -y \
+          libx11-dev \
+          libxrandr-dev \
+          libglu1-mesa-dev
 
       - name: Build binaries
         run: make all
