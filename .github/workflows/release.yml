@@ -19,12 +19,7 @@ jobs:
           go-version: "1.24"
 
       - name: Install Linux graphical dependencies
-        run: |
-          sudo apt-get update && sudo apt-get install -y \
-          libx11-dev \
-          libxrandr-dev \
-          libglu1-mesa-dev \
-          libxcursor-dev
+        run: sudo apt-get update && sudo apt-get install -y xorg-dev libgl1-mesa-dev
 
       - name: Build binaries
         run: make all
@@ -55,6 +50,9 @@ jobs:
     needs: build
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
       - name: Download build artifacts
         uses: actions/download-artifact@v5
         with:
@@ -70,14 +68,10 @@ jobs:
       - name: Publish Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "Tetris v${{ github.ref_name }}"
+          name: "Tetris ${{ github.ref_name }}"
           body: |
             ## 📝 Changelog
             ${{ steps.changelog.outputs.changelog }}
-          files: |
-            build/tennis-linux-amd64.tar.gz
-            build/tennis-windows-amd64.tar.gz
-            build/tennis-linux-amd64.zip
-            build/tennis-windows-amd64.zip
+          files: build/tennis-*.{tar.gz,zip}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
