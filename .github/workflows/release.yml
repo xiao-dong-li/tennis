@@ -21,6 +21,9 @@ jobs:
       #- name: Install dependencies
       #  run: make deps
 
+      - name: Install Linux graphical dependencies
+        run: sudo apt-get update && sudo apt-get install -y libx11-dev
+
       - name: Build binaries
         run: make all
 
