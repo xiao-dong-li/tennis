@@ -1,0 +1,77 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: "1.24"
+
+      - name: Install Linux graphical dependencies
+        run: sudo apt-get update && sudo apt-get install -y xorg-dev libgl1-mesa-dev
+
+      - name: Build binaries
+        run: make all
+
+      - name: Package binaries
+        run: |
+          VERSION=${GITHUB_REF_NAME}
+          cd build
+
+          # TAR.GZ
+          tar -zcvf tennis-${VERSION}-linux-amd64.tar.gz tennis
+          tar -zcvf tennis-${VERSION}-windows-amd64.tar.gz tennis.exe
+
+          # ZIP
+          zip -j tennis-${VERSION}-linux-amd64.zip tennis
+          zip -j tennis-${VERSION}-windows-amd64.zip tennis.exe
+          cd ..
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries
+          path: build/
+
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v5
+        with:
+          name: binaries
+          path: build/
+
+      - name: Generate Changelog
+        id: changelog
+        uses: metcalfc/changelog-generator@v4.6.2
+        with:
+          mytoken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Tetris ${{ github.ref_name }}"
+          body: |
+            ## 📝 Changelog
+            ${{ steps.changelog.outputs.changelog }}
+          files: build/tennis-*.{tar.gz,zip}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
